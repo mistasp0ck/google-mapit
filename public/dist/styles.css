@@ -1,0 +1,787 @@
+/**
+ * All of the CSS for your public-facing functionality should be
+ * included in this file.
+ */
+/* #page-header it just included for the examples */
+#page-header {
+  display: block;
+  float: left;
+  max-width: 800px;
+}
+
+#page-header .bh-sl-title {
+  color: #797874;
+  font: normal 20px/1.4 Arial, Helvetica, sans-serif;
+}
+
+@media (min-width: 1024px) {
+  #page-header .bh-sl-title {
+    font-size: 30px;
+  }
+}
+/* Infowindow Roboto font override */
+.gm-style div, .gm-style span, .gm-style label, .gm-style a {
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.bh-sl-error {
+  clear: both;
+  color: #ae2118;
+  float: left;
+  font-weight: bold;
+  padding: 10px 0;
+  width: 100%;
+}
+
+.gm-style img {
+  max-width: none !important;
+  max-height: none !important;
+}
+
+/* Avoid image issues with Google Maps and CSS resets */
+.bh-sl-map-container img {
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  max-height: none !important;
+  max-width: none !important;
+}
+
+.bh-sl-container {
+  box-sizing: border-box;
+  color: #555555;
+  float: left;
+  font: normal 14px/1.4 Arial, Helvetica, sans-serif;
+  padding: 0 15px;
+  width: 100%;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: table;
+  /* Avoid issues with Google Maps and CSS frameworks */
+}
+
+#content .bh-sl-container {
+  padding: 0;
+  text-align: left;
+}
+
+.vertical-align {
+  display: table-cell;
+  vertical-align: middle;
+}
+
+.bh-sl-container > * {
+  box-sizing: content-box !important;
+}
+
+.bh-sl-container .bh-sl-form-container {
+  position: absolute;
+  z-index: 1;
+  height: 50%;
+  /* Set your own height: percents, ems, whatever! */
+  width: auto;
+  /* Set your own width: percents, ems, whatever! */
+  overflow: auto;
+  /* Recommended in case content is larger than the container */
+  margin: auto;
+  /* Center the item vertically & horizontally */
+  position: absolute;
+  /* Break it out of the regular flow */
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  /* Set the bounds in which to center it, relative to its parent/container */
+  margin-top: 150px;
+}
+
+.bh-sl-form-container {
+  padding: 0;
+  max-width: 653px;
+}
+
+.bh-sl-form-container .form-input {
+  padding-left: 15px;
+  padding-right: 15px;
+}
+
+.bh-sl-form-container .form-input lable {
+  display: none;
+}
+
+.bh-sl-container .form-input input {
+  color: #888888;
+  letter-spacing: 0.64px;
+  line-height: 30px;
+  font-weight: 400;
+  border-radius: 10px 0px 0px 10px;
+  border: none;
+  width: 71%;
+  display: inline-block;
+  padding: 7px 8px;
+  font-size: 14px;
+  float: left;
+}
+
+.bh-sl-loc-list .form-input input {
+  font-size: 16px;
+  padding: 6px 12px;
+}
+
+.bh-sl-form-container button {
+  border-radius: 0px 10px 10px 0px;
+  background: #00B6B6;
+  font-size: 15px;
+  color: #FFFFFF;
+  letter-spacing: 0.11px;
+  line-height: 16px;
+  border: none;
+  padding: 14px 13px 14px 13px;
+  display: inline-block;
+  margin-left: 0px;
+  float: left;
+}
+
+.bh-sl-form-container .search-link {
+  font-size: 14px;
+  color: #D8D8D8;
+  letter-spacing: 0.1px;
+  line-height: 16px;
+  clear: both;
+  text-align: center;
+  display: block;
+  margin: 0 auto;
+  padding: 14px 0 0 0;
+}
+
+#bh-sl-map {
+  transition: opacity ease 1s;
+}
+
+.bh-sl-container .bh-sl-loading {
+  background: url(../img/ajax-loader.gif) no-repeat;
+  float: left;
+  margin: 4px 0 0 10px;
+  height: 16px;
+  width: 16px;
+}
+
+.bh-sl-container .bh-sl-filters-container {
+  clear: both;
+  float: left;
+  margin: 0;
+  width: 100%;
+  background: #fff;
+  padding: 18px;
+}
+
+.bh-sl-form-container button#use-location {
+  display: none;
+  position: absolute;
+  right: 86px;
+  background: transparent;
+  color: #515154;
+  font-size: 24px;
+  top: -5px;
+}
+
+.bh-sl-loc-list button#use-location {
+  display: none;
+  position: absolute;
+  right: 0px;
+  background: transparent;
+  color: #515154;
+  font-size: 19px;
+  top: 44px;
+  /* left: 0; */
+  background: #eee;
+  border: 1px solid #E2E2E2;
+  padding: 4px 11px;
+  z-index: 2;
+}
+
+.toggle-filters {
+  color: #555555;
+  line-height: 2.2;
+  background: #eee;
+  border: 1px solid #E2E2E2;
+  height: 36px;
+  width: auto;
+  display: block;
+  padding: 3px 17px;
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  background: #eee;
+  cursor: pointer;
+}
+
+.toggle-filters:hover, .bh-sl-loc-list button#use-location:hover {
+  background-color: #fff;
+  transition: border, color, background-color 0.1s ease-in-out;
+}
+
+.bh-sl-container .bh-sl-filters-container.closed {
+  height: 36px;
+  box-shadow: 0px 1px 1px 0px rgba(51, 51, 51, 0.55);
+  padding-top: 0;
+}
+
+.bh-sl-container .bh-sl-filters-container {
+  display: block;
+  position: relative;
+  top: 0;
+  overflow: hidden;
+  border-bottom: 1px solid #E2E2E2;
+  padding-top: 43px;
+  max-height: 500px;
+  transition: max-height 1.3s ease;
+}
+
+.bh-sl-container .bh-sl-filters-container input[type="checkbox"] {
+  width: 30px;
+}
+
+.bh-sl-container .bh-sl-filters-container input {
+  margin-left: 10px;
+}
+
+.bh-sl-container .bh-sl-filters-container .bh-sl-filters {
+  float: left;
+  list-style: none;
+  margin: 0 100px 0 0;
+  padding: 0;
+}
+
+.bh-sl-container .bh-sl-filters-container .bh-sl-filters li {
+  clear: left;
+  display: block;
+  float: left;
+  margin: 3px 0;
+  width: 100%;
+  font-size: 12px;
+}
+
+.bh-sl-container .bh-sl-filters-container .bh-sl-filters li label {
+  display: inline;
+  vertical-align: text-bottom;
+}
+
+.bh-sl-container .bh-sl-filters-container .bh-sl-filters li input {
+  display: block;
+  float: left;
+  margin-right: 2px;
+  margin-left: 0;
+  margin-top: 0;
+}
+
+.bh-sl-container .bh-sl-filters-container .bh-sl-filters li select {
+  box-sizing: border-box;
+  border: 1px solid #cccccc;
+  border-radius: 4px;
+  font: normal 14px/1.4 Arial, Helvetica, sans-serif;
+  padding: 6px 12px;
+  -webkit-border-radius: 4px;
+}
+
+.bh-sl-container .bh-sl-map-container {
+  clear: left;
+  float: left;
+  width: 100%;
+}
+
+.bh-sl-loc-list {
+  transition: all ease 0.5s;
+}
+
+.closed.bh-sl-loc-list {
+  left: -275px;
+}
+
+.bh-sl-loc-list .form-input input {
+  float: left;
+  border-radius: 0;
+  padding: 6px 9px;
+  font-size: 18px;
+  border: 1px solid #B1B1B1;
+  width: 76%;
+}
+
+.bh-sl-loc-list .form-input button {
+  padding: 13px 18px 13px 18px;
+  background-color: #00b6b6;
+  color: #fff;
+  border: none;
+  border-bottom: 1px #FFF;
+  float: left;
+}
+
+.bh-sl-pagination-container {
+  display: none;
+}
+
+@media (min-width: 1024px) {
+  .bh-sl-container .bh-sl-map-container {
+    margin-bottom: 60px;
+  }
+}
+.bh-sl-container .bh-sl-map-container a {
+  color: #005293;
+  text-decoration: none;
+}
+
+.bh-sl-container .bh-sl-map-container a:active, .bh-sl-container .bh-sl-map-container a:focus, .bh-sl-container .bh-sl-map-container a:hover {
+  text-decoration: underline;
+}
+
+.bh-sl-container .bh-sl-loc-list {
+  font-size: 13px;
+  height: auto;
+  overflow-x: visible;
+  overflow-y: hidden;
+}
+
+.bh-sl-container .bh-sl-loc-list ul {
+  display: block;
+  width: 100%;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.bh-sl-container .bh-sl-loc-list ul li {
+  border: 1px solid white;
+  /* Adding this to prevent moving li elements when adding the list-focus class*/
+  box-sizing: border-box;
+  clear: left;
+  cursor: pointer;
+  display: block;
+  float: left;
+  width: 100%;
+}
+
+.bh-sl-container .bh-sl-loc-list .list-label {
+  background: #00192d;
+  border-radius: 15px;
+  color: white;
+  display: block;
+  float: left;
+  font-weight: bold;
+  margin: 10px 0 0 15px;
+  padding: 4px 7px;
+  text-align: center;
+  width: auto;
+  min-width: 13px;
+}
+
+.bh-sl-container .bh-sl-loc-list .list-details {
+  float: left;
+  margin-left: 6px;
+  width: 80%;
+}
+
+.bh-sl-container .bh-sl-loc-list .list-details .list-content {
+  padding: 10px;
+}
+
+.bh-sl-container .bh-sl-loc-list .list-details .loc-dist {
+  color: #8e8e8e;
+  font-weight: bold;
+  font-style: italic;
+}
+
+.bh-sl-container .bh-sl-loc-list .list-focus {
+  border: 1px solid rgba(0, 82, 147, 0.4);
+  transition: border 0.2s linear 0s, box-shadow 0.2s linear 0s;
+}
+
+.bh-sl-container .bh-sl-loc-list .bh-sl-close-directions-container {
+  height: 20px;
+  position: relative;
+  width: 100%;
+}
+
+.bh-sl-container .bh-sl-loc-list .bh-sl-close-directions-container .bh-sl-close-icon {
+  right: 6px;
+  top: 0;
+}
+
+.bh-sl-container .bh-sl-loc-list .bh-sl-directions-panel {
+  margin: 0 2%;
+  /* Avoid issues with table-layout */
+}
+
+.bh-sl-container .bh-sl-loc-list .bh-sl-directions-panel table {
+  table-layout: auto;
+}
+
+.bh-sl-container .bh-sl-loc-list .bh-sl-directions-panel table, .bh-sl-container .bh-sl-loc-list .bh-sl-directions-panel td {
+  vertical-align: middle;
+  border-collapse: separate;
+}
+
+.bh-sl-container .bh-sl-loc-list .bh-sl-directions-panel td {
+  padding: 1px;
+}
+
+.bh-sl-container .bh-sl-loc-list .bh-sl-directions-panel .adp-placemark {
+  margin: 10px 0;
+  border: 1px solid #c0c0c0;
+}
+
+.bh-sl-container .bh-sl-loc-list .bh-sl-directions-panel .adp-marker {
+  padding: 3px;
+}
+
+.bh-sl-container .bh-sl-loc-list .bh-sl-noresults-title {
+  font-weight: bold;
+  margin: 15px;
+}
+
+.bh-sl-container .bh-sl-loc-list .bh-sl-noresults-desc {
+  margin: 0 15px;
+}
+
+.bh-sl-container .loc-name {
+  /* Picked up by both list and infowindows */
+  font-size: 15px;
+  font-weight: bold;
+}
+
+.bh-sl-container .bh-sl-map {
+  height: 390px;
+  width: 100%;
+}
+
+.bh-sl-container .bh-sl-pagination-container {
+  clear: both;
+}
+
+.bh-sl-container .bh-sl-pagination-container ol {
+  list-style-type: none;
+  margin: 0;
+  padding: 10px 0;
+  text-align: center;
+}
+
+.bh-sl-container .bh-sl-pagination-container ol li {
+  color: #005293;
+  cursor: pointer;
+  display: inline-block;
+  font: bold 14px Arial, Helvetica, sans-serif;
+  padding: 10px;
+}
+
+.bh-sl-container .bh-sl-pagination-container ol .bh-sl-current {
+  color: #555555;
+  cursor: auto;
+  text-decoration: none;
+}
+
+/* Modal window */
+.bh-sl-overlay {
+  background: url(../img/overlay-bg.png) repeat;
+  height: 100%;
+  left: 0;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 10000;
+}
+
+.bh-sl-overlay .bh-sl-modal-window {
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 0 10px #656565;
+  position: absolute;
+  left: 50%;
+  margin-left: -460px;
+  /* width divided by 2 */
+  margin-top: 60px;
+  height: 620px;
+  width: 920px;
+  z-index: 10010;
+}
+
+.bh-sl-overlay .bh-sl-modal-window .bh-sl-map-container {
+  margin-top: 50px;
+  /* increase map container margin */
+}
+
+.bh-sl-overlay .bh-sl-modal-window .bh-sl-modal-content {
+  float: left;
+  padding: 0 1%;
+  /* there's already a margin on the top of the map-container div */
+  width: 98%;
+}
+
+.bh-sl-overlay .bh-sl-modal-window .bh-sl-close-icon {
+  right: 22px;
+  top: 13px;
+}
+
+.bh-sl-close-icon {
+  cursor: pointer;
+  height: 24px;
+  position: absolute;
+  width: 24px;
+}
+
+.bh-sl-close-icon:after, .bh-sl-close-icon:before {
+  background: #cccccc;
+  content: '';
+  display: block;
+  height: 24px;
+  margin: -3px 0 0 -1px;
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  right: 3px;
+  top: 3px;
+  width: 3px;
+  -webkit-transform: rotate(45deg);
+  -moz-transform: rotate(45deg);
+  -ms-transform: rotate(45deg);
+  -o-transform: rotate(45deg);
+  transform: rotate(45deg);
+}
+
+.bh-sl-close-icon:hover:after, .bh-sl-close-icon:hover:before {
+  background: #b3b3b3;
+}
+
+.bh-sl-close-icon:before {
+  -webkit-transform: rotate(-45deg);
+  -moz-transform: rotate(-45deg);
+  -ms-transform: rotate(-45deg);
+  -o-transform: rotate(-45deg);
+  transform: rotate(-45deg);
+}
+
+.map .location {
+  background: #FFFFFF;
+  box-shadow: 0px 0px 3px 1px rgba(64, 64, 65, 0.55);
+}
+
+.map .location h4 {
+  font-weight: bold;
+  font-size: 21.18px;
+  color: #404042;
+  letter-spacing: 0.05px;
+  line-height: 21px;
+  margin-bottom: 5px;
+}
+
+.map .location h5 {
+  color: #00A9A6;
+  font-size: 14.83px;
+  margin-top: 5px;
+}
+
+.map .location {
+  border-left: 5.3px solid #404042;
+  padding: 4px 20px;
+  margin-bottom: 14px;
+  position: relative;
+}
+
+.bh-sl-loc-list {
+  display: block;
+  position: absolute;
+  z-index: 1;
+  top: 66px;
+  left: 0px;
+  opacity: 0;
+  transition: all ease-in-out 0.1;
+}
+
+.map .btn {
+  margin-top: 17px;
+}
+
+.map .location .ico-hourglass {
+  position: absolute;
+  right: 10px;
+  top: 33%;
+  padding: 0;
+}
+
+.map-container {
+  /*  display: block;
+    width: 100%;
+    height: 490px;*/
+}
+
+#content .bh-sl-container {
+  padding: 0px 0 0 0;
+}
+
+#content .bh-sl-loc-list {
+  padding-left: 0;
+  visibility: hidden;
+  width: 100%;
+  padding-right: 0px;
+}
+
+#content .bh-sl-container .bh-sl-map {
+  float: right;
+}
+
+.bh-sl-loc-list .form-input input {
+  float: left;
+}
+
+.toggle-sidebar {
+  width: 23px;
+  height: 48px;
+  position: absolute;
+  right: 1px;
+  top: 60px;
+  border: none;
+  border-radius: 0 3px 3px 0;
+  display: none;
+}
+
+.toggle-sidebar:hover {
+  background-color: #EEEEEE;
+}
+
+.toggle-sidebar i {
+  color: #555;
+  font-size: 20px;
+  margin-right: 4px;
+}
+
+.bh-sl-container .bh-sl-loc-list {
+  position: absolute;
+}
+
+.bh-sl-loc-list {
+  top: 0px;
+}
+
+@media (min-width: 768px) {
+  .bh-sl-loc-list {
+    top: 66px;
+  }
+
+  .bh-sl-container .bh-sl-loc-list {
+    height: 675px;
+  }
+
+  .bh-sl-container .bh-sl-loc-list ul {
+    display: block;
+    clear: left;
+    float: left;
+    width: 100%;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    max-height: 600px;
+    overflow-y: scroll;
+  }
+
+  .toggle-sidebar {
+    display: block;
+  }
+
+  #content .bh-sl-loc-list {
+    min-width: 260px;
+    max-width: 299px;
+    width: 100%;
+    padding-right: 24px;
+  }
+
+  .bh-sl-form-container .search-link {
+    padding: 24px 0 0 0;
+    font-size: 17px;
+  }
+
+  .bh-sl-form-container button#use-location {
+    right: 148px;
+  }
+
+  .bh-sl-loc-list button#use-location {
+    top: 42px;
+    right: 24px;
+  }
+
+  .bh-sl-container .form-input input {
+    max-width: 556px;
+    font-size: 24px;
+    letter-spacing: 0.64px;
+    line-height: 30px;
+    font-weight: 400;
+    padding: 13px 18px;
+    max-width: 556px;
+  }
+
+  .bh-sl-form-container button {
+    padding: 22px 18px 18px 18px;
+  }
+
+  .bh-sl-container .bh-sl-map {
+    height: 790px;
+  }
+
+  .bh-sl-container .bh-sl-form-container {
+    margin-top: 385px;
+  }
+
+  .bh-sl-form-container .form-input {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .bh-sl-loc-list .form-input input {
+    font-size: 16px;
+    padding: 6px 12px;
+    max-width: 197px;
+    border: none;
+  }
+
+  .bh-sl-loc-list .form-input button {
+    padding: 12px 18px 12px 18px;
+  }
+}
+@media (min-width: 992px) {
+  .container {
+    width: 960px;
+  }
+
+  .bh-sl-container .form-input input {
+    max-width: 556px;
+    letter-spacing: 0.64px;
+    line-height: 30px;
+    font-weight: 400;
+    padding: 13px 18px;
+    max-width: 556px;
+  }
+}
+@media (min-width: 1200px) {
+  .bh-sl-loc-list button#use-location {
+    display: none;
+  }
+
+  .bh-sl-form-container button#use-location {
+    display: none;
+  }
+
+  .bh-sl-form-container button#use-location {
+    right: 96px;
+  }
+
+  .bh-sl-container .form-input input {
+    width: 87%;
+  }
+
+  .bh-sl-loc-list .form-input input {
+    font-size: 16px;
+    padding: 6px 12px;
+    max-width: 197px;
+    border: none;
+  }
+}
+
+/*# sourceMappingURL=styles.css.map */
