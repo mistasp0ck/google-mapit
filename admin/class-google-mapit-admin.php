@@ -84,12 +84,12 @@ class Google_Mapit_Admin {
 		$this->plugin_name = $plugin_name;
 		$this->version = $version;
 		// $this->taxonomy = $taxonomy;
-		$this->options = get_option( 'google_mapit_settings' );
+		// $this->options = get_option( 'google_mapit_settings' );
 
 		add_image_size($prefix . 'custom_icon_small', 40,40,true);
 		add_image_size($prefix . 'custom-icon_large', 80,80,true);
 
-		define( 'GML_PAGE_MAIN_SLUG', 'google-maps-locator' );
+		define( 'GML_PAGE_MAIN_SLUG', 'google-mapit' );
 
 		// Field Array  
 		$this->location_meta_fields = array(  
@@ -216,8 +216,10 @@ class Google_Mapit_Admin {
 
 		if ( !empty($post->post_type) && 'location' == $post->post_type && ($hook == 'post.php' || $hook == 'post-new.php') ) {
     
+			$prefix = $this->prefix;
+			$api_key = get_option($prefix.'api_key');
 
-			$api_key = get_option('google_mapit_api_key');
+			error_log($api_key);
 			$google_maps_url = 'https://maps.googleapis.com/maps/api/js';
 
 			$google_api_url = add_query_arg( array(
@@ -323,10 +325,10 @@ class Google_Mapit_Admin {
 	}
 
 	public function google_mapit_setup_fields() { 
-		$prefix = 'gmi_';
+		$prefix = $this->prefix;
 		$fields = array(
 		    array(
-		        'uid' => $prefix . '_api_key',
+		        'uid' => $prefix . 'api_key',
 		        'label' => 'Google API Key',
 		        'section' => 'main_section',
 		        'type' => 'text',
@@ -697,10 +699,10 @@ class Google_Mapit_Admin {
       case 'checkbox':
         if( ! empty ( $arguments['options'] ) && is_array( $arguments['options'] ) ){
             $options_markup = '';
-            $iterator = 0;
+            $i = 0;
             foreach( $arguments['options'] as $key => $label ){
-                $iterator++;
-                $options_markup .= sprintf( '<label for="%1$s_%6$s"><input id="%1$s_%6$s" name="%1$s[]" type="%2$s" value="%3$s" %4$s /> %5$s</label><br/>', $arguments['uid'], $arguments['type'], $key, checked( $value[ array_search( $key, $value, true ) ], $key, false ), $label, $iterator );
+                $i++;
+                $options_markup .= sprintf( '<label for="%1$s_%6$s"><input id="%1$s_%6$s" name="%1$s[]" type="%2$s" value="%3$s" %4$s /> %5$s</label><br/>', $arguments['uid'], $arguments['type'], $key, checked( $value[ array_search( $key, $value, true ) ], $key, false ), $label, $i );
             }
             printf( '<fieldset>%s</fieldset>', $options_markup );
         }
@@ -928,25 +930,25 @@ class Google_Mapit_Admin {
 		}
 
 		$labels = array(
-			'name'               => _x( 'Locations', 'post type general name', 'metro_health' ),
-			'singular_name'      => _x( 'Location', 'post type singular name', 'metro_health' ),
-			'menu_name'          => _x( 'Locations', 'admin menu', 'metro_health' ),
-			'name_admin_bar'     => _x( 'Location', 'add new on admin bar', 'metro_health' ),
-			'add_new'            => _x( 'Add New', 'Location', 'metro_health' ),
-			'add_new_item'       => __( 'Add New Location', 'metro_health' ),
-			'new_item'           => __( 'New Location', 'metro_health' ),
-			'edit_item'          => __( 'Edit Location', 'metro_health' ),
-			'view_item'          => __( 'View Location', 'metro_health' ),
-			'all_items'          => __( 'All Locations', 'metro_health' ),
-			'search_items'       => __( 'Search Locations', 'metro_health' ),
-			'parent_item_colon'  => __( 'Parent Locations:', 'metro_health' ),
-			'not_found'          => __( 'No Locations found.', 'metro_health' ),
-			'not_found_in_trash' => __( 'No Locations found in Trash.', 'metro_health' )
+			'name'               => _x( 'Locations', 'post type general name', 'google-mapit' ),
+			'singular_name'      => _x( 'Location', 'post type singular name', 'google-mapit' ),
+			'menu_name'          => _x( 'Locations', 'admin menu', 'google-mapit' ),
+			'name_admin_bar'     => _x( 'Location', 'add new on admin bar', 'google-mapit' ),
+			'add_new'            => _x( 'Add New', 'Location', 'google-mapit' ),
+			'add_new_item'       => __( 'Add New Location', 'google-mapit' ),
+			'new_item'           => __( 'New Location', 'google-mapit' ),
+			'edit_item'          => __( 'Edit Location', 'google-mapit' ),
+			'view_item'          => __( 'View Location', 'google-mapit' ),
+			'all_items'          => __( 'All Locations', 'google-mapit' ),
+			'search_items'       => __( 'Search Locations', 'google-mapit' ),
+			'parent_item_colon'  => __( 'Parent Locations:', 'google-mapit' ),
+			'not_found'          => __( 'No Locations found.', 'google-mapit' ),
+			'not_found_in_trash' => __( 'No Locations found in Trash.', 'google-mapit' )
 		);
 
 		$args = array(
 			'labels'             => $labels,
-			'description'        => __( 'Description.', 'metro_health' ),
+			'description'        => __( 'Description.', 'google-mapit' ),
 			'public'             => $public,
 			'publicly_queryable' => true,
 			'show_ui'            => true,
@@ -1355,6 +1357,7 @@ class Google_Mapit_Admin {
 	}  
 
 	function google_mapit_save_location_category_icon( $term_id ) {
+		$prefix = $this->prefix;
 
 	    if ( ! isset( $_POST['category_icon_nonce'] ) || ! wp_verify_nonce( $_POST['category_icon_nonce'], basename( __FILE__ ) ) )
 	        return;

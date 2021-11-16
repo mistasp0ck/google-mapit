@@ -69,8 +69,10 @@ class Google_Mapit_Public {
 
 		$this->plugin_name = $plugin_name;
 		$this->version = $version;
-		$this->prefix = $prefix;
 		$this->atts = [];
+
+		$prefix = 'gmi_'; 
+		$this->prefix = $prefix;
 
 	}
 
@@ -103,7 +105,8 @@ class Google_Mapit_Public {
 	 */
 	public function enqueue_scripts() {
 
-		$api_key = get_option('google_mapit_api_key');
+		$prefix = $this->prefix;
+		$api_key = get_option($prefix.'api_key');
 
 		$google_maps_url = 'https://maps.googleapis.com/maps/api/js';
 
