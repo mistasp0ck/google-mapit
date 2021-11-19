@@ -38,8 +38,8 @@ Shortcode defaults
 			'zoom' => '',
 			'max_zoom' => '',
 			'bounds_padding' => '',
-			'expanded_height' => ''  ```
-
+			'expanded_height' => ''  
+```
 
 Known Issues
 ------------
