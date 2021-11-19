@@ -7,10 +7,11 @@ Shortcode Options
 -----------------
 Code Example  | Options
 ------------- | -------------
-`[map search="true"]`  | `true,false`
+`[map search="true"]`  | `true,false` Creates an initial overlay with a search input. This will enable the sidebar by default.
 `[map sidebar="true"]`  | `true,false`
 `[map width="300"]`  | Any numeric value (px)
 `[map height="300"]`  | Any numeric value (px)
+`[map expanded_height="852"]`  | Any numeric value (px) This adds an expanded map height that is triggered when the search overlay is used.
 `[map full_width="true"]`  | `true,false` **Note:** this will override the map `width`
 `[map categories="category-name"]`  | Use the Category Slug
 `[map orderby="menu_order"]`  | [WP Codex](https://codex.wordpress.org/Class_Reference/WP_Query#Order_.26_Orderby_Parameters)
@@ -45,9 +46,15 @@ Known Issues
 
 - Default location autofill doesn't work on an unsecure site
 
-
 Changelog
 ---------
+
+- 1.3.0: Added multiple features and cleaned up conditional states
+ - Updated main map style
+ - fixed issues with the search and sidebar states to ensure proper functionality.
+ - fixed naming discrepencies for all plugin settings adding the prefix `gmi_` to all options.
+ - resolved some PHP notices and warnings
+ - upgraded `jquery.storelocator` to v3.1.5
 
 - 1.2.0: Added multiple features
  - zoom, ids, max_zoom, bounds_padding, expanded height

@@ -102,7 +102,7 @@ class Google_Mapit_Admin {
 	    array(  
 	        'label'=> 'Address',  
 	        'desc'  => '',  
-	        'id' => $prefix . 'street_addy',
+	        'id' => 'street_addy',
 	        'name'    => $prefix . 'address',   
 	        'type'  => 'text' 
 	    ), 
@@ -136,7 +136,7 @@ class Google_Mapit_Admin {
 	    array(  
 	        'label'=> 'Country',  
 	        'desc'  => '',  
-	        'id' => $prefix . 'country', 
+	        'id' => 'country', 
 	        'name'    => $prefix . 'country',  
 	        'type'  => 'text' 
 	    ),  
@@ -237,15 +237,17 @@ class Google_Mapit_Admin {
 		} 
 		
 		if ($hook == 'edit-tags.php' || $hook == 'term.php') {
-			wp_enqueue_script('jquery');
+			// wp_enqueue_script('jquery');
 			// This will enqueue the Media Uploader script
 
 			wp_enqueue_media();
 
-			wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/google-mapit-admin.js', array(), $this->version, true );
+			wp_enqueue_style( 'wp-color-picker' );
+
+			wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/google-mapit-admin.js', array('wp-color-picker','jquery'), $this->version, true );
 		}
-		// error_log($hook);
-		if ($hook == 'toplevel_page_gmi_general' || $hook == 'location-map_page_gmi_design_options' || $hook == 'location-map_page_gmi_location_options') {
+
+		if ($hook == 'mapit_page_gmi_general' || $hook == 'mapit_page_gmi_design_options' || $hook == 'mapit_page_gmi_location_options') {
 			// This will enqueue the Media Uploader script
 			wp_enqueue_media();
 
@@ -429,18 +431,38 @@ class Google_Mapit_Admin {
 		        'page' => 'gmi_general'
 		    ),
 		    // @todo: add autocomplete type for this
-		    array(
-		        'uid' => $prefix . 'default_location',
-		        'label' => 'Default Address',
-		        'section' => 'main_section',
-		        'type' => 'text',
-		        'options' => false,
-		        'placeholder' => '',
-		        // 'helper' => 'Does this help?',
-		        'supplemental' => '',
-		        'default' => '',
-		        'page' => 'gmi_general'
-		    ),
+		    // array(
+		    //     'uid' => $prefix . 'default_location',
+		    //     'label' => 'Default Address',
+		    //     'section' => 'main_section',
+		    //     'type' => 'text',
+		    //     'options' => false,
+		    //     'placeholder' => '',
+		    //     // 'helper' => 'Does this help?',
+		    //     'supplemental' => '',
+		    //     'default' => '',
+		    //     'page' => 'gmi_general'
+		    // ),
+		    // array(
+		    //     'uid' => $prefix . 'default_lat',
+		    //     'section' => 'main_section',
+		    //     'type' => 'hidden',
+		    //     'options' => false,
+		    //     'supplemental' => '',
+		    //     'default' => '',
+		    //     'class' => 'hidden',
+		    //     'page' => 'gmi_general'
+		    // ),
+		    // array(
+		    //     'uid' => $prefix . 'default_lng',
+		    //     'section' => 'main_section',
+		    //     'type' => 'hidden',
+		    //     'options' => false,
+		    //     'supplemental' => '',
+		    //     'default' => '',
+		    //     'class' => 'hidden',
+		    //     'page' => 'gmi_general'
+		    // ),
 		    array(
 		        'uid' => $prefix . 'info_show_directions',
 		        'label' => 'Show directions link?',
@@ -632,8 +654,6 @@ class Google_Mapit_Admin {
 						$field['post_type'] = $p_type;
 						$uid = $field['uid'] . $p_type;
 						$label = $field['label'] . $p_type;
-						// error_log('*****uid in add_settings_field: ' . $uid);
-						// error_log(print_r($field,true));
 						add_settings_field( 
 							$uid, 
 							$label, 
@@ -673,13 +693,16 @@ class Google_Mapit_Admin {
     }
 
     switch( $arguments['type'] ){
+    	case 'hidden':
+        printf( '<input name="%1$s" id="%1$s" type="%2$s" placeholder="%3$s" value="%4$s" />', $arguments['uid'], $arguments['type'], !empty($arguments['placeholder']) ? $arguments['placeholder'] : '', $value );
+        break;    	
       case 'text':
       case 'password':
       case 'number':
-        printf( '<input name="%1$s" id="%1$s" type="%2$s" placeholder="%3$s" value="%4$s" />', $arguments['uid'], $arguments['type'], $arguments['placeholder'], $value );
+        printf( '<input name="%1$s" id="%1$s" type="%2$s" placeholder="%3$s" value="%4$s" />', $arguments['uid'], $arguments['type'], !empty($arguments['placeholder']) ? $arguments['placeholder'] : '', $value );
         break;
       case 'textarea':
-        printf( '<textarea name="%1$s" id="%1$s" placeholder="%2$s" rows="5" cols="50">%3$s</textarea>', $arguments['uid'], $arguments['placeholder'], $value );
+        printf( '<textarea name="%1$s" id="%1$s" placeholder="%2$s" rows="5" cols="50">%3$s</textarea>', $arguments['uid'], !empty($arguments['placeholder']) ? $arguments['placeholder'] : '', $value );
         break;
       case 'select':
       case 'multiselect':
@@ -687,7 +710,8 @@ class Google_Mapit_Admin {
             $attributes = '';
             $options_markup = '';
             foreach( $arguments['options'] as $key => $label ){
-                $options_markup .= sprintf( '<option value="%s" %s>%s</option>', $key, selected( $value[ array_search( $key, $value, true ) ], $key, false ), $label );
+            		$checked = (!empty($value) && $value[ array_search( $key, $value, true )] )? 'checked="checked"' : '';
+                $options_markup .= sprintf( '<option value="%s" %s>%s</option>', $key, $checked, $label );
             }
             if( $arguments['type'] === 'multiselect' ){
                 $attributes = ' multiple="multiple" ';
@@ -702,13 +726,22 @@ class Google_Mapit_Admin {
             $i = 0;
             foreach( $arguments['options'] as $key => $label ){
                 $i++;
-                $options_markup .= sprintf( '<label for="%1$s_%6$s"><input id="%1$s_%6$s" name="%1$s[]" type="%2$s" value="%3$s" %4$s /> %5$s</label><br/>', $arguments['uid'], $arguments['type'], $key, checked( $value[ array_search( $key, $value, true ) ], $key, false ), $label, $i );
+
+                $checked = (!empty($value) && $value[ array_search( $key, $value, true )] )? 'checked="checked"' : '';
+
+                $options_markup .= sprintf( '<label for="%1$s_%6$s"><input id="%1$s_%6$s" name="%1$s[]" type="%2$s" value="%3$s" %4$s /> %5$s</label><br/>', 
+                	$arguments['uid'], 
+                	$arguments['type'], 
+                	$key, 
+                	$checked, 
+                	$label, 
+                	$i );
             }
             printf( '<fieldset>%s</fieldset>', $options_markup );
         }
         break;
       case 'colorpicker':
-    		printf('<input name="%1$s" id="%1$s" type="%2$s" placeholder="%3$s" value="%4$s" data-default-color="%5$s" class="colorpicker" />', $arguments['uid'], $arguments['type'], $arguments['placeholder'], $value, $arguments['default']);
+    		printf('<input name="%1$s" id="%1$s" type="%2$s" placeholder="%3$s" value="%4$s" data-default-color="%5$s" class="colorpicker" />', $arguments['uid'], $arguments['type'], !empty($arguments['placeholder']) ? $arguments['placeholder'] : '', $value, $arguments['default']);
     		break;
       case 'image':
 
@@ -744,7 +777,7 @@ class Google_Mapit_Admin {
   			?>
   			<ul>
   			<?php foreach ($taxonomy_objects as $tax) { 
-  				$checked = (in_array($tax->name, $value)) ? 'checked="checked"' : '';
+  				$checked = (is_array($value) && in_array($tax->name, $value)) ? 'checked="checked"' : '';
   				?>
   				<li style="margin-bottom: 5px;"> 
   					<?php
@@ -774,7 +807,7 @@ class Google_Mapit_Admin {
 	  			if ($post_type == 'location') {
 	  				continue;
 	  			}
-	  			$checked = (in_array($post_type, $value)) ? 'checked="checked"' : '';
+	  			$checked = (is_array($value) && in_array($post_type, $value)) ? 'checked="checked"' : '';
 	  			?>
 	  			<li style="margin-bottom: 5px;">
 					<?php
@@ -1122,100 +1155,86 @@ class Google_Mapit_Admin {
 	            	      margin-bottom: 2px;
 	            	    }
 	            	  </style>
-	            	</head>
-
-	            	<body>
 	            	  <div id="locationField">
 	            	    <input id="autocomplete" name="location" value="<?php echo $meta; ?>" placeholder="Enter your address" onFocus="geolocate()" type="text"></input>
 	            	  </div>
+<script>
+	            	  	var placeSearch, autocomplete;
+var componentForm = {
+  street_addy: 'long_name',
+  locality: 'long_name',
+  administrative_area_level_1: 'short_name',
+  postal_code: 'short_name',
+  country: 'short_name',
+  lat: 'short_name',
+  lng: 'short_name'
+};
 
-	            	  <script>
-	            	    // This example displays an address form, using the autocomplete feature
-	            	    // of the Google Places API to help users fill in the information.
+function initAutocomplete() {
+  // Create the autocomplete object, restricting the search to geographical
+  // location types.
+  autocomplete = new google.maps.places.Autocomplete(
+    (document.getElementById('autocomplete')),
+    {types: ['geocode']});
 
-	            	    // This example requires the Places library. Include the libraries=places
-	            	    // parameter when you first load the API. For example:
-	            	    // <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places">
+  // When the user selects an address from the dropdown, populate the address
+  // fields in the form.
+  autocomplete.addListener('place_changed', fillInAddress);
+}
 
-	            	    var placeSearch, autocomplete;
-	            	    var componentForm = {
-	            	      // street_number: 'short_name',
-	            	      street_addy: 'long_name',
-	            	      locality: 'long_name',
-	            	      administrative_area_level_1: 'short_name',
-	            	      postal_code: 'short_name',
-	            	      country: 'short_name',
-	            	      lat: 'short_name',
-	            	      lng: 'short_name'
-	            	    };
+function fillInAddress() {
+  // Get the place details from the autocomplete object.
+  var place = autocomplete.getPlace();
 
-	            	    function initAutocomplete() {
-	            	      // Create the autocomplete object, restricting the search to geographical
-	            	      // location types.
-	            	      autocomplete = new google.maps.places.Autocomplete(
-	            	          /** @type {!HTMLInputElement} */(document.getElementById('autocomplete')),
-	            	          {types: ['geocode']});
+  for (var component in componentForm) {
+    console.log(component);
+    document.getElementById(component).value = '';
+    document.getElementById(component).disabled = false;
+  }
 
-	            	      // When the user selects an address from the dropdown, populate the address
-	            	      // fields in the form.
-	            	      autocomplete.addListener('place_changed', fillInAddress);
-	            	    }
+  // Get each component of the address from the place details
+  // and fill the corresponding field on the form.
+  for (var i = 0; i < place.address_components.length; i++) {
+    var addressType = place.address_components[i].types[0];
+    if (componentForm[addressType]) {
+      var val = place.address_components[i][componentForm[addressType]];
+      document.getElementById(addressType).value = val;
+    }
+  }
+  if(componentForm['street_addy']) {
+    var val = place.name;
+    document.getElementById('street_addy').value = val;
+  }
 
-	            	    function fillInAddress() {
-	            	      // Get the place details from the autocomplete object.
-	            	      var place = autocomplete.getPlace();
+  // Add Latitude and Longitude to hidden fields
+  if (componentForm['lat']) {
+    var val = place.geometry.location.lat();
+    document.getElementById('lat').value = val;
+  }
+  if (componentForm['lng']) {
+    var val = place.geometry.location.lng();
+    document.getElementById('lng').value = val;
+  }
+}
 
-	            	      for (var component in componentForm) {
-	            	      	// console.log(component);
-	            	        document.getElementById(component).value = '';
-	            	        document.getElementById(component).disabled = false;
-	            	      }
-
-	            	      // Get each component of the address from the place details
-	            	      // and fill the corresponding field on the form.
-	            	      for (var i = 0; i < place.address_components.length; i++) {
-	            	        var addressType = place.address_components[i].types[0];
-							if (componentForm[addressType]) {
-	            	          var val = place.address_components[i][componentForm[addressType]];
-	            	          document.getElementById(addressType).value = val;
-	            	        }
-	            	      }
-	            	      if(componentForm['street_addy']) {
-	            	      	var val = place.name;
-	            	      	document.getElementById('street_addy').value = val;
-	            	      }
-
-	            	      // Add Latitude and Longitude to hidden fields
-	            	      if (componentForm['lat']) {
-	            	      	var val = place.geometry.location.lat();
-	            	      	document.getElementById('lat').value = val;
-
-	            	      }
-	            	      if (componentForm['lng']) {
-	            	      	var val = place.geometry.location.lng();
-	            	      	document.getElementById('lng').value = val;
-
-	            	      }
-	            	    }
-
-	            	    // Bias the autocomplete object to the user's geographical location,
-	            	    // as supplied by the browser's 'navigator.geolocation' object.
-	            	    function geolocate() {
-	            	      if (navigator.geolocation) {
-	            	        navigator.geolocation.getCurrentPosition(function(position) {
-	            	          var geolocation = {
-	            	            lat: position.coords.latitude,
-	            	            lng: position.coords.longitude
-	            	          };
-	            	          var circle = new google.maps.Circle({
-	            	            center: geolocation,
-	            	            radius: position.coords.accuracy
-	            	          });
-	            	          autocomplete.setBounds(circle.getBounds());
-	            	        });
-	            	      }
-	            	    }
-	            	  </script>
+// Bias the autocomplete object to the user's geographical location,
+// as supplied by the browser's 'navigator.geolocation' object.
+function geolocate() {
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(function(position) {
+      var geolocation = {
+        lat: position.coords.latitude,
+        lng: position.coords.longitude
+      };
+      var circle = new google.maps.Circle({
+        center: geolocation,
+        radius: position.coords.accuracy
+      });
+      autocomplete.setBounds(circle.getBounds());
+    });
+  }
+}
+</script>
 
 <?php
 	            	break;

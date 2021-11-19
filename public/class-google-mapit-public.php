@@ -111,9 +111,9 @@ class Google_Mapit_Public {
 		$google_maps_url = 'https://maps.googleapis.com/maps/api/js';
 
 		$google_api_url = add_query_arg( array(
-		    'key' => $api_key,
-		    'libraries' => 'places',
-		    'region' => 'US',
+			'key' => $api_key,
+			'libraries' => 'places',
+			'region' => 'US',
 		), $google_maps_url );
 		/**
 		 * This function is provided for demonstration purposes only.
@@ -127,11 +127,11 @@ class Google_Mapit_Public {
 		 * class.
 		 */
 
-		wp_enqueue_script( 'handlebars', plugin_dir_url( __FILE__ ). 'js/libs/handlebars.min.js', array( 'jquery' ), $this->version, true );
+		wp_enqueue_script( 'handlebars', plugin_dir_url( __FILE__ ). 'js/libs/handlebars/handlebars-4.7.7.js', array( 'jquery' ), $this->version, true );
 
 		wp_enqueue_script( 'google-api', $google_api_url, '', $this->version, true );
 
-		wp_enqueue_script( 'jquery-storelocator', plugin_dir_url( __FILE__ ) . 'js/plugins/storeLocator/min/jquery.storelocator-min.js', array( 'jquery','google-api' ), $this->version, true );
+		wp_enqueue_script( 'jquery-storelocator', plugin_dir_url( __FILE__ ) . 'js/plugins/storeLocator/jquery.storelocator.min.js', array( 'jquery','google-api' ), $this->version, true );
 
 		wp_register_script( 'locator-map', plugin_dir_url( __FILE__ ) . 'js/locator-map.js', array('jquery', 'wp-api','google-api'), $this->version, true );
 
@@ -147,8 +147,8 @@ class Google_Mapit_Public {
 		register_rest_field( 'location', 'location_meta_fields', array(
 			'get_callback' => array($this ,'get_post_meta_for_api'),
 			'schema' => null,
-			)
-		);
+		)
+	);
 	}
 
 	/*************************************
@@ -171,13 +171,13 @@ class Google_Mapit_Public {
 			wp_print_footer_scripts();
 		}
 	}
-     
-  public function get_post_meta_for_api( $object ) {
+
+	public function get_post_meta_for_api( $object ) {
      //get the id of the post object array
-     $post_id = $object['id'];
-     
+		$post_id = $object['id'];
+
      //return the post meta
-     return get_post_meta( $post_id );
+		return get_post_meta( $post_id );
 	}
 
 	public function google_mapit_shortcode($atts = [], $content = null, $tag = ''){ 
@@ -189,6 +189,15 @@ class Google_Mapit_Public {
 		$button_color_hover = get_option($prefix . 'button_color_hover');
 		$button_text_color = get_option($prefix . 'button_text_color');
 		$link_text_color = get_option($prefix . 'link_text_color');
+		if (get_option(get_option($prefix . 'default_location'))) {
+			$default_location = true;	
+			$default_lat = get_option($prefix . 'default_lat');
+			$default_lng = get_option($prefix . 'default_lng');
+		} else {
+			$default_location = false;
+		}
+
+		error_log($default_location);
 
 		extract(shortcode_atts(array(	
 			'title' => '',
@@ -228,7 +237,7 @@ class Google_Mapit_Public {
 		// of JavaScript files
 		//
 		if (!defined('SLPLUS_SHORTCODE_RENDERED')) {
-		 define('SLPLUS_SHORTCODE_RENDERED',true);
+			define('SLPLUS_SHORTCODE_RENDERED',true);
 		}
 
 		//defaults
@@ -266,109 +275,117 @@ class Google_Mapit_Public {
 				$optheight = 'height: '.$height.'px;';				
 			}		
 		}
+
+		if (!empty($expanded_height)) {
+
+
+			$expanded_height = ' data-expanded-height="'.$expanded_height.'" ';
+		}
+
+
 		$stylesh = ' style="'.$optheight.'"';
 		$styles = ' style="'.$optwidth.$optheight.'"';	
 
 		ob_start(); ?>
-			<?php 
-			$output = '';
-			$output .= '<style type="text/css">
-			.form-input button,.bh-sl-form-container button {
-				background-color: '.$button_color.';
-				color: '.$button_text_color.';
-			}
-			.closed .toggle-sidebar i {
-				color: '.$button_color.';
-			}
-			.form-input button:hover,.form-input button:active,.form-input button:focus, .bh-sl-form-container button:hover,
-			.bh-sl-form-container button:hover, .bh-sl-form-container button:active, .bh-sl-form-container button:focus {
-				background-color: '.$button_color_hover.';
-			}
-			.bh-sl-form-container .search-link {
-				color: '.$link_text_color.';
-			}
-			</style>';
+		<?php 
+		$output = '';
+		$output .= '<style type="text/css">
+		.form-input button,.bh-sl-form-container button {
+			background-color: '.$button_color.';
+			color: '.$button_text_color.';
+		}
+		.closed .toggle-sidebar i {
+			color: '.$button_color.';
+		}
+		.form-input button:hover,.form-input button:active,.form-input button:focus, .bh-sl-form-container button:hover,
+		.bh-sl-form-container button:hover, .bh-sl-form-container button:active, .bh-sl-form-container button:focus {
+			background-color: '.$button_color_hover.';
+		}
+		.bh-sl-form-container .search-link {
+			color: '.$link_text_color.';
+		}
+		</style>';
 
-			$output .= '<div class="bh-sl-filters-container closed">
-			<div class="toggle-filters"><span class="btn-primary btn-sm"><i class="fa fa-sliders-h"></i> Edit Filters <i class="fa fa-chevron-down"></i></span></div>
-			<ul class="bh-sl-filter-heading">
-				<li class="filter_heading">Filters</li>
-				<li><a href="#" class="search-link-sidebar">View All</a></li>
-			</ul>';
+		$output .= '<div class="bh-sl-filters-container closed">
+		<div class="toggle-filters"><span class="btn-primary btn-sm"><i class="fa fa-sliders-h"></i> Edit Filters <i class="fa fa-chevron-down"></i></span></div>
+		<ul class="bh-sl-filter-heading">
+		<li class="filter_heading">Filters</li>
+		<li><a href="#" class="search-link-sidebar">View All</a></li>
+		</ul>';
 			// begin loop for $tax 
-			if ($taxonomies = get_option( $prefix . 'taxonomies' )) {
-				$i = 1;
-				foreach ($taxonomies as $tax) {
+		if ($taxonomies = get_option( $prefix . 'taxonomies' )) {
+			$i = 1;
+			foreach ($taxonomies as $tax) {
 					# code...
-					$output .='<ul id="category-filters-'.$tax.'" class="bh-sl-filters ">
+				$output .='<ul id="category-filters-'.$tax.'" class="bh-sl-filters ">
 
-					';
+				';
 
-					if ( $post_types = get_option( $prefix . 'post_types' ) ) {
-						$post_type_count = count($post_types);
-					} else { 	
-						$post_type_count = 0;
-					}
+				if ( $post_types = get_option( $prefix . 'post_types' ) ) {
+					$post_type_count = count($post_types);
+				} else { 	
+					$post_type_count = 0;
+				}
 
-					if ( $taxonomies = get_option( $prefix . 'taxonomies' ) ) {
-						$taxonomy_count = count($taxonomies);
-					} else { 	
-						$taxonomy_count = 0;
-					}
+				if ( $taxonomies = get_option( $prefix . 'taxonomies' ) ) {
+					$taxonomy_count = count($taxonomies);
+				} else { 	
+					$taxonomy_count = 0;
+				}
 
 					// if ((count($options['post_types']) + count($options['taxonomies'])) > 1) {
-					if (($post_type_count + $taxonomy_count) > 1) {
+				if (($post_type_count + $taxonomy_count) > 1) {
 						// add title with multiple categories
-						$tax_obj = get_taxonomy( $tax );
+					$tax_obj = get_taxonomy( $tax );
 
 						// get title from tax slug
-						$output .='<li class="filter_title">'.$tax_obj->label.'</li>';
-					}
+					$output .='<li class="filter_title">'.$tax_obj->label.'</li>';
+				}
 
-					$args = array(
-						'type'                     => 'location',		
-						'category'                 => $categories,
-						'orderby'                  => $orderby,
-						'order'                    => $order,
-						'hide_empty'               => 1,
-						'hierarchical'             => 1,
-						'exclude'                  => '',
-						'include'                  => '',
-						'number'                   => '',
+				$args = array(
+					'type'                     => 'location',		
+					'category'                 => $categories,
+					'orderby'                  => $orderby,
+					'order'                    => $order,
+					'hide_empty'               => 1,
+					'hierarchical'             => 1,
+					'exclude'                  => '',
+					'include'                  => '',
+					'number'                   => '',
 						// Add Loop for this filter for $tax
-						'taxonomy'                 => $tax,
-						'pad_counts'               => false 
+					'taxonomy'                 => $tax,
+					'pad_counts'               => false 
 
-					); 		
-					if ($categories != '') {
-						$cats = explode(',', $categories);
-					} else {
-						$cats = array();
-					}
+				); 		
+				if ($categories != '') {
+					$cats = explode(',', $categories);
+				} else {
+					$cats = array();
+				}
 
-					$terms = get_categories( $args );	
+				$terms = get_categories( $args );	
 					// error_log(print_r($terms,true));
-					if ( $terms && !is_wp_error( $terms ) ) :
-				
-						foreach ( $terms as $term ) { 
-							$custom_cat_icon = get_term_meta($term->term_id, 'custom_icon',true );
-							if ($custom_cat_icon != '') {
+				if ( $terms && !is_wp_error( $terms ) ) :
+
+					foreach ( $terms as $term ) { 
+						$custom_cat_icon = get_term_meta($term->term_id, 'custom_icon',true );
+						if ($custom_cat_icon != '') {
 								// just add categories regardless of taxonomy
-								$cat_icon_url = wp_get_attachment_url($custom_cat_icon);
-								$cat_icon = '<img src="'.$cat_icon_url.'" width="16" height="16" />';
-							} else {
-								$cat_icon = '';
-							}
-							if (in_array($term->slug, $cats) ) {
-								$checked = ' checked="checked"';
-							} else {
-								$checked = ' ';
-							}
-							$output .='
-							<li class="checkbox"><label><input type="checkbox" id="'.$term->slug.'" name="'.$tax.'" value="'.$term->slug.'"'.$checked.'/><label for="'.$term->slug.'"></label>'.$term->name.$cat_icon.'</label></li>';
-						} 	
-													
-					endif;									
+							$cat_icon_url = wp_get_attachment_url($custom_cat_icon);
+							$cat_icon = '<img src="'.$cat_icon_url.'" width="16" height="16" />';
+						} else {
+							$cat_icon = '';
+						}
+						if (in_array($term->slug, $cats) ) {
+							$checked = ' checked="checked"';
+						} else {
+							$checked = ' ';
+						}
+						$output .='
+						<li class="checkbox"><label><input type="checkbox" id="'.$term->slug.'" name="'.$tax.'" value="'.$term->slug.'"'.$checked.'/><label for="'.$term->slug.'"></label>'.$term->name.$cat_icon.'</label></li>';
+					} 	
+
+				endif;									
 				$output .= '</ul>';
 				$i++;
 				}//end loop
@@ -401,9 +418,9 @@ class Google_Mapit_Public {
 					}
 
 					$args = array(
-					    'post_type' => $post_type,
-					    'post__in' => $ids,
-					    'posts_per_page' => -1
+						'post_type' => $post_type,
+						'post__in' => $ids,
+						'posts_per_page' => -1
 					);
 
 					$posts = get_posts( $args );
@@ -419,70 +436,70 @@ class Google_Mapit_Public {
 							$output .='
 							<li class="checkbox"><label><input type="checkbox" id="'.$post->ID.'" name="'.$post_type.'" value="'.$post->ID.'"'.$checked.'/><label for="'.$post->ID.'"></label>'.$post->post_title.'</label></li>';
 						} 	
-													
+
 					endif;									
-				$output .= '</ul>';
-				$i++;
+					$output .= '</ul>';
+					$i++;
 				}//end loop
 			}
-		$output .= '</div>';
-		?>	
+			$output .= '</div>';
+			?>	
 
 			<?php if ($full_width == 'true') { ?> 
-			<div class="js-force-full-width map-top-container"<?php echo $expanded_height; ?>>
-			<?php } else { ?>
-			<div class="row map-top-container"<?php echo $styles; ?><?php echo $expanded_height; ?>>
+				<div class="js-force-full-width map-top-container"<?php echo $expanded_height; ?>>
+				<?php } else { ?>
+					<div class="row map-top-container"<?php echo $styles; ?><?php echo $expanded_height; ?>>
 						<div class="col-sm-12">
-			<?php } ?> 	
-				<?php if($title != '') { ?><h2 class="map-title"><?php echo $title; ?></h2><?php } ?>
-				<div class="bh-sl-container">			<div class="map-overlay"></div>
-					<?php if ($search == 'true') : ?>
-						<div class="bh-sl-form-container">
-							<form id="bh-sl-user-location" method="post" action="#">
-								<div class="form-input">
-									<div class="search-title">Search by city or zip code</div>
-									<button id="bh-sl-submit" type="submit" value="Search" class="fa fa-search"></button>
-									<div class="form-input-wrapper">
-										<label for="bh-sl-address" class="bh-sl-address"></label>
-										<div class="form-input-wrapper-inner">
-										<button id="use-location" data-toggle="tooltip" data-placement="left" title="Use my Location"><i class="fa fa-map-marker-alt"></i></button>
-										<input type="text" id="bh-sl-address" name="bh-sl-address" placeholder="Enter (city, state) or (zip)" />
-										</div>
-									</div>			
-									<?php echo $output; ?>
+						<?php } ?> 	
+						<?php if($title != '') { ?><h2 class="map-title"><?php echo $title; ?></h2><?php } ?>
+						<div class="bh-sl-container">			<div class="map-overlay"></div>
+						<?php if ($search == 'true') : ?>
+							<div class="bh-sl-form-container">
+								<form id="bh-sl-user-location" method="post" action="#">
+									<div class="form-input">
+										<div class="search-title">Enter your Location</div>
+										<button id="bh-sl-submit" type="submit" value="Search" class="fa fa-search"></button>
+										<div class="form-input-wrapper">
+											<label for="bh-sl-address" class="bh-sl-address"></label>
+											<div class="form-input-wrapper-inner">
+												<button id="use-location" data-toggle="tooltip" data-placement="left" title="Use my Location"><i class="fa fa-map-marker-alt"></i></button>
+												<input type="text" id="bh-sl-address" name="bh-sl-address" placeholder="Enter (city, state) or (zip)" />
+											</div>
+										</div>			
+										<?php echo $output; ?>
+									</div>
+								</form>	
+								<a href="#" class="search-link">View All Locations</a>		
+							</div>
+
+						<?php endif; ?>
+
+						<div id="bh-sl-map-container" class="bh-sl-map-container map-container">
+							<?php if ($sidebar == 'true' || $search == 'true') : ?>
+								<div class="bh-sl-loc-list">
+									<button class="toggle-sidebar"><i class="fa"></i></button>
+									<div class="results-wrapper">
+										<ul class="list">
+
+										</ul>
+									</div>  
 								</div>
-							</form>	
-							<a href="#" class="search-link">View All Locations</a>		
+								<div class="bh-sl-pagination-container">
+									<ol class="bh-sl-pagination"></ol>
+								</div>
+							<?php endif; ?>	
+							<div id="bh-sl-map" class="bh-sl-map"<?php echo $stylesh; ?>></div>
 						</div>
-
-					<?php endif; ?>
-
-					<div id="bh-sl-map-container" class="bh-sl-map-container map-container">
-					<?php if ($sidebar == 'true') : ?>
-						<div class="bh-sl-loc-list">
-							<button class="toggle-sidebar"><i class="fa"></i></button>
-							<div class="results-wrapper">
-								<ul class="list">
-
-								</ul>
-							</div>  
-						</div>
-						<div class="bh-sl-pagination-container">
-							<ol class="bh-sl-pagination"></ol>
-						</div>
-					<?php endif; ?>	
-						<div id="bh-sl-map" class="bh-sl-map"<?php echo $stylesh; ?>></div>
 					</div>
-				</div>
 
-		<?php if ($full_width == 'true') { ?> 
+					<?php if ($full_width == 'true') { ?> 
+					</div>	
+				<?php } else { ?>
+				</div>			
 			</div>	
-		<?php } else { ?>
-			</div>			
-		</div>	
 		<?php } ?> 							 							    
 
-	<?php
+		<?php
 		return ob_get_clean();
 	}
 
@@ -496,9 +513,23 @@ class Google_Mapit_Public {
 		$prefix = $this->prefix;
 
 		$settings = array();
-		// // add global stuff here
+		// add global stuff here
 		if ($option = get_option($prefix . 'default_location')) {
-			$settings['default_location'] = $option;
+			$settings['default_location'] = true;
+		}
+		if ($option = get_option($prefix . 'default_lat')) {
+			$settings['default_lat'] = $option;
+		}
+
+		if ($option = get_option($prefix . 'default_lng')) {
+			$settings['default_lng'] = $option;
+		}
+
+		if(!empty($map_atts['search'])) {
+			$settings['search'] = $map_atts['search'];
+		}
+		if(!empty($map_atts['sidebar'])) {
+			$settings['sidebar'] = $map_atts['sidebar'];
 		}
 
 		if (!empty($map_atts['zoom'])) {
@@ -584,7 +615,7 @@ class Google_Mapit_Public {
 			'orderby' => 'menu_order',
 			'order' => 'ASC',
 			'posts_per_page' => -1
-			);
+		);
 
 		$prefix = $this->prefix;
 		// get Atts from Shortcode
@@ -593,7 +624,11 @@ class Google_Mapit_Public {
 		if(isset($map_atts['categories'])) {
 			$args['location-category'] = $map_atts['categories'];
 			$locations['settings']['categories'] = $map_atts['categories'];
+		}
 
+		if(isset($map_atts['categories'])) {
+			$args['location-category'] = $map_atts['categories'];
+			$locations['settings']['categories'] = $map_atts['categories'];
 		}
 		if(isset($map_atts['orderby'])) {
 			$args['orderby'] = $map_atts['orderby'];
@@ -656,7 +691,7 @@ class Google_Mapit_Public {
 
 			} else {
 				// @todo: add error messaging instead of rendering map
-		    return;
+				return;
 			}
 
 		} else {
@@ -690,7 +725,7 @@ class Google_Mapit_Public {
 					$address = get_post_meta( get_the_ID(), $prefix . 'address', true );
 					// Check if the custom field has a value.
 					if ( ! empty( $address ) ) {
-					    $location['address'] = $address;
+						$location['address'] = $address;
 					} else {
 						$location['address'] = '';
 					}
@@ -698,7 +733,7 @@ class Google_Mapit_Public {
 					$address2 = get_post_meta( get_the_ID(), $prefix . 'address2', true );
 					// Check if the custom field has a value.
 					if ( ! empty( $address2 ) ) {
-					    $location['address2'] = $address2;
+						$location['address2'] = $address2;
 					} else {
 						$location['address2'] = '';
 					}
@@ -706,7 +741,7 @@ class Google_Mapit_Public {
 					$city = get_post_meta( get_the_ID(), $prefix . 'city', true );
 					// Check if the custom field has a value.
 					if ( ! empty( $city ) ) {
-					    $location['city'] = $city;
+						$location['city'] = $city;
 					} else {
 						$location['city'] = '';
 					}
@@ -714,7 +749,7 @@ class Google_Mapit_Public {
 					$state = get_post_meta( get_the_ID(), $prefix . 'state', true );
 					// Check if the custom field has a value.
 					if ( ! empty( $state ) ) {
-					    $location['state'] = $state;
+						$location['state'] = $state;
 					} else {
 						$location['state'] = '';
 					}
@@ -722,7 +757,7 @@ class Google_Mapit_Public {
 					$postal = get_post_meta( get_the_ID(), $prefix . 'postal', true );
 					// Check if the custom field has a value.
 					if ( ! empty( $postal ) ) {
-					    $location['postal'] = $postal;
+						$location['postal'] = $postal;
 					} else {
 						$location['postal'] = '';
 					}						
@@ -730,7 +765,7 @@ class Google_Mapit_Public {
 					$latitude = get_post_meta( get_the_ID(), $prefix . 'lat', true );
 					// Check if the custom field has a value.
 					if ( ! empty( $latitude ) ) {
-					    $location['lat'] = $latitude;
+						$location['lat'] = $latitude;
 					} else {
 						$location['lat'] = '';
 					}
@@ -738,7 +773,7 @@ class Google_Mapit_Public {
 					$longitude = get_post_meta( get_the_ID(), $prefix . 'lng', true );
 					// Check if the custom field has a value.
 					if ( ! empty( $longitude ) ) {
-					    $location['lng'] = $longitude;
+						$location['lng'] = $longitude;
 					} else {
 						$location['lng'] = '';
 					}
@@ -782,7 +817,7 @@ class Google_Mapit_Public {
 					$web = get_post_meta( get_the_ID(), $prefix . 'link', true );
 					// Check if the custom field has a value.
 					if ( ! empty( $web )) {
-					    $location['web'] = $web;
+						$location['web'] = $web;
 					} else if (get_option($prefix . 'enable_single')) {
 						$location['web'] = get_the_permalink();
 					} else {
@@ -826,10 +861,10 @@ class Google_Mapit_Public {
 
 								if (count($posts > 1)) {
 									$posts_array = array();
-									  foreach ( $posts as $post ) {
+									foreach ( $posts as $post ) {
 									  	//@todo pass both id and title to reduce server requests
-									    $posts_array[] = $post->ID; 
-									  }
+										$posts_array[] = $post->ID; 
+									}
 									$location[$post_type] = implode(', ', $posts_array);			
 								} else {
 									$location[$post_type] = $posts;
@@ -849,7 +884,7 @@ class Google_Mapit_Public {
 							// error_log(print_r($terms,true));
 							// Check if the custom field has a value.
 							if ( ! empty( $custom_icon ) ) {
-							    $location['custom_icon'] = $custom_icon;
+								$location['custom_icon'] = $custom_icon;
 							} else if (! empty( $custom_cat_icon )) {
 								$location['custom_icon'] = $custom_cat_icon;
 							} else {
@@ -863,11 +898,11 @@ class Google_Mapit_Public {
 									$cat_slugs = array();
 									$category_name = array();
 									error_log(count($terms));
-								    foreach($terms as $term) {
-											$cat_slugs[] = $term->slug;
-											$category_name[] = $term->name;
+									foreach($terms as $term) {
+										$cat_slugs[] = $term->slug;
+										$category_name[] = $term->name;
 											// error_log('$term->slug' . $term->slug);
-										}	
+									}	
 									$location[$tax] = implode(', ', $cat_slugs);
 
 									if($tax == 'location-type') {
@@ -889,7 +924,7 @@ class Google_Mapit_Public {
 
 						// Check if the custom field has a value.
 						if ( ! empty( $custom_icon ) ) {
-						    $location['custom_icon'] = $custom_icon;
+							$location['custom_icon'] = $custom_icon;
 						} else if (! empty( $custom_cat_icon )) {
 							$location['custom_icon'] = $custom_cat_icon;
 						} else {
@@ -899,7 +934,7 @@ class Google_Mapit_Public {
 						if ( ! empty( $cats ) ) {
 							if (count($cats->slug > 1)) {
 								$categories = array();
-							    foreach($cats as $cat) {
+								foreach($cats as $cat) {
 									$categories[] = $cat->slug;
 									$category_name[] = $cat->name;
 								}	
@@ -920,7 +955,7 @@ class Google_Mapit_Public {
 					$phone = get_post_meta( get_the_ID(), $prefix . 'phone', true );
 					// Check if the custom field has a value.
 					if ( ! empty( $phone )) {
-					    $location['phone'] = $phone;
+						$location['phone'] = $phone;
 					} else {
 						$location['phone'] = '';
 					}
@@ -928,7 +963,7 @@ class Google_Mapit_Public {
 					$fax = get_post_meta( get_the_ID(), $prefix . 'fax', true );
 					// Check if the custom field has a value.
 					if ( ! empty( $fax )) {
-					    $location['fax'] = $fax;
+						$location['fax'] = $fax;
 					} else {
 						$location['fax'] = '';
 					}
@@ -936,14 +971,17 @@ class Google_Mapit_Public {
 					array_push($locations, $location);
 
 
-				$i++;
+					$i++;
 				endwhile;
 				wp_reset_postdata();
 			endif;
 			
 
+				// error_log($locations);
 			//Output JSON
 			$locations = json_encode($locations); 
+
+				error_log($locations);
 
 		}	 
 		return $locations;	
@@ -951,5 +989,5 @@ class Google_Mapit_Public {
 
 }
 
-	
+
 

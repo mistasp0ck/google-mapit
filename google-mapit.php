@@ -25,6 +25,14 @@
  * Domain Path:       /languages
  */
 
+define( 'GMI_PLUGIN', __FILE__ );
+
+define( 'GMI_PLUGIN_BASENAME', plugin_basename( GMI_PLUGIN ) );
+
+define( 'GMI_PLUGIN_NAME', trim( dirname( GMI_PLUGIN_BASENAME ), '/' ) );
+
+define( 'GMI_PLUGIN_DIR', untrailingslashit( dirname( GMI_PLUGIN ) ) );
+
 // If this file is called directly, abort.
 if ( ! defined( 'WPINC' ) ) {
 	die;

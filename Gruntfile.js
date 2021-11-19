@@ -115,7 +115,7 @@ module.exports = function(grunt) {
           },
           options: {
               watchTask: true,
-              proxy: "tony.local:8888/theme-dev/"
+              proxy: "tony.local:8888/tonys-site/"
           }
       }
     },

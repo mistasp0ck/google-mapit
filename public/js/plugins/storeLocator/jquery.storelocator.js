@@ -1,6 +1,6 @@
-/*! jQuery Google Maps Store Locator - v3.0.1 - 2018-09-29
+/*! jQuery Google Maps Store Locator - v3.1.5 - 2021-09-27
 * http://www.bjornblog.com/web/jquery-store-locator-plugin
-* Copyright (c) 2018 Bjorn Holine; Licensed MIT */
+* Copyright (c) 2021 Bjorn Holine; Licensed MIT */
 
 ;(function ($, window, document, undefined) {
 	'use strict';
@@ -17,136 +17,130 @@
 	var featuredset = [], locationset = [], normalset = [], markers = [];
 	var filters = {}, locationData = {}, GeoCodeCalc = {}, mappingObj = {};
 
-	// Create the defaults once. DO NOT change these settings in this file - settings should be overridden in the plugin call
-	var defaults = {
-		'ajaxData'                   : null,
-		'altDistanceNoResult'        : false,
-		'autoComplete'               : false,
-		'autoCompleteDisableListener': false,
-		'autoCompleteOptions'        : {},
-		'autoGeocode'                : false,
-		'bounceMarker'               : true,
-		'catMarkers'                 : null,
-		'dataLocation'               : 'data/locations.json',
-		'dataRaw'                    : null,
-		'dataType'                   : 'json',
-		'debug'                      : false,
-		'defaultLat'                 : null,
-		'defaultLng'                 : null,
-		'defaultLoc'                 : false,
-		'disableAlphaMarkers'        : false,
-		'distanceAlert'              : 60,
-		'dragSearch'                 : false,
-		'exclusiveFiltering'         : false,
-		'exclusiveTax'               : null,
-		'featuredLocations'          : false,
-		'fullMapStart'               : false,
-		'fullMapStartBlank'          : false,
-		'fullMapStartListLimit'      : false,
-		'infoBubble'                 : null,
-		'inlineDirections'           : false,
-		'lengthUnit'                 : 'm',
-		'listColor1'                 : '#ffffff',
-		'listColor2'                 : '#eeeeee',
-		'loading'                    : false,
-		'locationsPerPage'           : 10,
-		'mapSettings'                : {
-			mapTypeId: google.maps.MapTypeId.ROADMAP,
-			zoom     : 12
-		},
-		'markerCluster'              : null,
-		'markerImg'                  : null,
-		'markerDim'                  : null,
-		'maxDistance'                : false,
-		'modal'                      : false,
-		'nameAttribute'              : 'name',
-		'nameSearch'                 : false,
-		'noForm'                     : false,
-		'openNearest'                : false,
-		'originMarker'               : false,
-		'originMarkerDim'            : null,
-		'originMarkerImg'            : null,
-		'pagination'                 : false,
-		'querystringParams'          : false,
-		'selectedMarkerImg'          : null,
-		'selectedMarkerImgDim'       : null,
-		'sessionStorage'             : false,
-		'slideMap'                   : true,
-		'sortBy'                     : null,
-		'storeLimit'                 : 26,
-		'taxonomyFilters'            : null,
-		'visibleMarkersList'         : false,
-		'xmlElement'                 : 'marker',
-		// HTML elements
-		'addressID'                  : 'bh-sl-address',
-		'closeIcon'                  : 'bh-sl-close-icon',
-		'formContainer'              : 'bh-sl-form-container',
-		'formID'                     : 'bh-sl-user-location',
-		'geocodeID'                  : null,
-		'lengthSwapID'               : 'bh-sl-length-swap',
-		'loadingContainer'           : 'bh-sl-loading',
-		'locationList'               : 'bh-sl-loc-list',
-		'mapID'                      : 'bh-sl-map',
-		'maxDistanceID'              : 'bh-sl-maxdistance',
-		'modalContent'               : 'bh-sl-modal-content',
-		'modalWindow'                : 'bh-sl-modal-window',
-		'orderID'                    : 'bh-sl-order',
-		'overlay'                    : 'bh-sl-overlay',
-		'regionID'                   : 'bh-sl-region',
-		'searchID'                   : 'bh-sl-search',
-		'sortID'                     : 'bh-sl-sort',
-		'taxonomyFiltersContainer'   : 'bh-sl-filters-container',
-		// Templates
-		'infowindowTemplatePath'     : 'assets/js/plugins/storeLocator/templates/infowindow-description.html',
-		'listTemplatePath'           : 'assets/js/plugins/storeLocator/templates/location-list-description.html',
-		'KMLinfowindowTemplatePath'  : 'assets/js/plugins/storeLocator/templates/kml-infowindow-description.html',
-		'KMLlistTemplatePath'        : 'assets/js/plugins/storeLocator/templates/kml-location-list-description.html',
-		'listTemplateID'             : null,
-		'infowindowTemplateID'       : null,
-		// Callbacks
-		'callbackAutoGeoSuccess'     : null,
-		'callbackBeforeSend'         : null,
-		'callbackCloseDirections'    : null,
-		'callbackCreateMarker'       : null,
-		'callbackDirectionsRequest'  : null,
-		'callbackFilters'            : null,
-		'callbackFormVals'           : null,
-		'callbackGeocodeRestrictions': null,
-		'callbackJsonp'              : null,
-		'callbackListClick'          : null,
-		'callbackMapSet'             : null,
-		'callbackMarkerClick'        : null,
-		'callbackModalClose'         : null,
-		'callbackModalOpen'          : null,
-		'callbackModalReady'         : null,
-		'callbackNearestLoc'         : null,
-		'callbackNoResults'          : null,
-		'callbackNotify'             : null,
-		'callbackOrder'              : null,
-		'callbackPageChange'         : null,
-		'callbackRegion'             : null,
-		'callbackSorting'            : null,
-		'callbackSuccess'            : null,
-		// Language options
-		'addressErrorAlert'          : 'Unable to find address',
-		'autoGeocodeErrorAlert'      : 'Automatic location detection failed. Please fill in your address or zip code.',
-		'distanceErrorAlert'         : 'Unfortunately, our closest location is more than ',
-		'kilometerLang'              : 'kilometer',
-		'kilometersLang'             : 'kilometers',
-		'mileLang'                   : 'mile',
-		'milesLang'                  : 'miles',
-		'noResultsTitle'             : 'No results',
-		'noResultsDesc'              : 'No locations were found with the given criteria. Please modify your selections or input.',
-		'nextPage'                   : 'Next &raquo;',
-		'prevPage'                   : '&laquo; Prev',
-		// @tones350 since 1.2
-		'fitBoundsPadding'           : {
-																			top: 0,
-																			right: 0,
-																			bottom: 0,
-																			left: 0
-																	 }
-	};
+    // Create the defaults once. DO NOT change these settings in this file - settings should be overridden in the plugin call
+    var defaults = {
+        'ajaxData'                   : null,
+        'altDistanceNoResult'        : false,
+        'autoComplete'               : false,
+        'autoCompleteDisableListener': false,
+        'autoCompleteOptions'        : {},
+        'autoGeocode'                : false,
+        'bounceMarker'               : true,
+        'catMarkers'                 : null,
+        'dataLocation'               : 'data/locations.json',
+        'dataRaw'                    : null,
+        'dataType'                   : 'json',
+        'debug'                      : false,
+        'defaultLat'                 : null,
+        'defaultLng'                 : null,
+        'defaultLoc'                 : false,
+        'disableAlphaMarkers'        : false,
+        'distanceAlert'              : 60,
+        'dragSearch'                 : false,
+        'exclusiveFiltering'         : false,
+        'exclusiveTax'               : null,
+        'featuredDistance'           : null,
+        'featuredLocations'          : false,
+        'fullMapStart'               : false,
+        'fullMapStartBlank'          : false,
+        'fullMapStartListLimit'      : false,
+        'infoBubble'                 : null,
+        'inlineDirections'           : false,
+        'lengthUnit'                 : 'm',
+        'listColor1'                 : '#ffffff',
+        'listColor2'                 : '#eeeeee',
+        'loading'                    : false,
+        'locationsPerPage'           : 10,
+        'mapSettings'                : {
+            mapTypeId: google.maps.MapTypeId.ROADMAP,
+            zoom     : 12
+        },
+        'markerCluster'              : null,
+        'markerImg'                  : null,
+        'markerDim'                  : null,
+        'maxDistance'                : false,
+        'modal'                      : false,
+        'nameAttribute'              : 'name',
+        'nameSearch'                 : false,
+        'noForm'                     : false,
+        'openNearest'                : false,
+        'originMarker'               : false,
+        'originMarkerDim'            : null,
+        'originMarkerImg'            : null,
+        'pagination'                 : false,
+        'querystringParams'          : false,
+        'selectedMarkerImg'          : null,
+        'selectedMarkerImgDim'       : null,
+        'sessionStorage'             : false,
+        'slideMap'                   : true,
+        'sortBy'                     : null,
+        'storeLimit'                 : 26,
+        'taxonomyFilters'            : null,
+        'visibleMarkersList'         : false,
+        'xmlElement'                 : 'marker',
+        // HTML elements
+        'addressID'                  : 'bh-sl-address',
+        'closeIcon'                  : 'bh-sl-close-icon',
+        'formContainer'              : 'bh-sl-form-container',
+        'formID'                     : 'bh-sl-user-location',
+        'geocodeID'                  : null,
+        'lengthSwapID'               : 'bh-sl-length-swap',
+        'loadingContainer'           : 'bh-sl-loading',
+        'locationList'               : 'bh-sl-loc-list',
+        'mapID'                      : 'bh-sl-map',
+        'maxDistanceID'              : 'bh-sl-maxdistance',
+        'modalContent'               : 'bh-sl-modal-content',
+        'modalWindow'                : 'bh-sl-modal-window',
+        'orderID'                    : 'bh-sl-order',
+        'overlay'                    : 'bh-sl-overlay',
+        'regionID'                   : 'bh-sl-region',
+        'searchID'                   : 'bh-sl-search',
+        'sortID'                     : 'bh-sl-sort',
+        'taxonomyFiltersContainer'   : 'bh-sl-filters-container',
+        // Templates
+        'infowindowTemplatePath'     : 'assets/js/plugins/storeLocator/templates/infowindow-description.html',
+        'listTemplatePath'           : 'assets/js/plugins/storeLocator/templates/location-list-description.html',
+        'KMLinfowindowTemplatePath'  : 'assets/js/plugins/storeLocator/templates/kml-infowindow-description.html',
+        'KMLlistTemplatePath'        : 'assets/js/plugins/storeLocator/templates/kml-location-list-description.html',
+        'listTemplateID'             : null,
+        'infowindowTemplateID'       : null,
+        // Callbacks
+        'callbackAutoGeoSuccess'     : null,
+        'callbackBeforeSend'         : null,
+        'callbackCloseDirections'    : null,
+        'callbackCreateMarker'       : null,
+        'callbackDirectionsRequest'  : null,
+        'callbackFilters'            : null,
+        'callbackFormVals'           : null,
+        'callbackGeocodeRestrictions': null,
+        'callbackJsonp'              : null,
+        'callbackListClick'          : null,
+        'callbackMapSet'             : null,
+        'callbackMarkerClick'        : null,
+        'callbackModalClose'         : null,
+        'callbackModalOpen'          : null,
+        'callbackModalReady'         : null,
+        'callbackNearestLoc'         : null,
+        'callbackNoResults'          : null,
+        'callbackNotify'             : null,
+        'callbackOrder'              : null,
+        'callbackPageChange'         : null,
+        'callbackRegion'             : null,
+        'callbackSorting'            : null,
+        'callbackSuccess'            : null,
+        // Language options
+        'addressErrorAlert'          : 'Unable to find address',
+        'autoGeocodeErrorAlert'      : 'Automatic location detection failed. Please fill in your address or zip code.',
+        'distanceErrorAlert'         : 'Unfortunately, our closest location is more than ',
+        'kilometerLang'              : 'kilometer',
+        'kilometersLang'             : 'kilometers',
+        'mileLang'                   : 'mile',
+        'milesLang'                  : 'miles',
+        'noResultsTitle'             : 'No results',
+        'noResultsDesc'              : 'No locations were found with the given criteria. Please modify your selections or input.',
+        'nextPage'                   : 'Next &raquo;',
+        'prevPage'                   : '&laquo; Prev'
+    };
 
 	// Plugin constructor
 	function Plugin(element, options) {
@@ -241,7 +235,8 @@
 
 		/**
 		 * Destroy
-		 * Note: The Google map is not destroyed here because Google recommends using a single instance and reusing it (it's not really supported)
+		 * Note: The Google map is not destroyed here because Google recommends using a single instance and reusing it
+		 * (it's not really supported)
 		 */
 		destroy: function () {
 			this.writeDebug('destroy');
@@ -400,6 +395,7 @@
 		 * Check for query string
 		 *
 		 * @param param {string} query string parameter to test
+		 *
 		 * @returns {string} query string value
 		 */
 		getQueryString: function(param) {
@@ -783,6 +779,7 @@
 						if (results[0]) {
 							var result = {};
 							result.address = results[0].formatted_address;
+							result.fullResult = results[0];
 							callbackFunction(result);
 						}
 					} else {
@@ -798,6 +795,7 @@
 		 *
 		 * @param num {number} the full number
 		 * @param dec {number} the number of digits to show after the decimal
+		 *
 		 * @returns {number}
 		 */
 		roundNumber: function (num, dec) {
@@ -809,6 +807,7 @@
 		 * Checks to see if the object is empty. Using this instead of $.isEmptyObject for legacy browser support
 		 *
 		 * @param obj {Object} the object to check
+		 *
 		 * @returns {boolean}
 		 */
 		isEmptyObject: function (obj) {
@@ -825,6 +824,7 @@
 		 * Checks to see if all the property values in the object are empty
 		 *
 		 * @param obj {Object} the object to check
+		 *
 		 * @returns {boolean}
 		 */
 		hasEmptyObjectVals: function (obj) {
@@ -969,46 +969,73 @@
 		},
 
 		/**
+		 * Run the matching between regular expression filters and string value
+		 *
+		 * @param filter {array} One or multiple filters to apply
+		 * @param val {string} Value to compare
+		 * @param inclusive {boolean} Inclusive (default) or exclusive
+		 *
+		 * @returns {boolean}
+		 */
+		filterMatching: function(filter, val, inclusive) {
+			this.writeDebug('inclusiveFilter',arguments);
+			inclusive = (typeof inclusive !== 'undefined') ?  inclusive : true;
+			var applyFilters;
+
+			// Undefined check.
+			if (typeof val === 'undefined') {
+				return false;
+			}
+
+			// Modify the join depending on inclusive (AND) vs exclusive (OR).
+			if ( true === inclusive ) {
+				applyFilters = filter.join('');
+			} else {
+				applyFilters = filter.join('|');
+			}
+
+			if ((new RegExp(applyFilters, 'i').test(val.replace(/([.*+?^=!:${}()|\[\]\/\\]|&\s+)/g, '')))) {
+				return true;
+			}
+
+			return false;
+		},
+
+		/**
 		 * Filter the data with Regex
 		 *
 		 * @param data {array} data array to check for filter values
 		 * @param filters {Object} taxonomy filters object
+		 *
 		 * @returns {boolean}
 		 */
 		filterData: function (data, filters) {
-			this.writeDebug('filterData',arguments);
+			this.writeDebug('filterData', arguments);
 			var filterTest = true;
 
 			for (var k in filters) {
 				if (filters.hasOwnProperty(k)) {
+					var testResults = [];
 
-					// Exclusive filtering
-					if (this.settings.exclusiveFiltering === true || (this.settings.exclusiveTax !== null && Array.isArray(this.settings.exclusiveTax) && this.settings.exclusiveTax.indexOf(k) !== -1)) {
-						var filterTests = filters[k];
-						var exclusiveTest = [];
+					for (var l = 0; l < filters[k].length; l++) {
 
-						if (typeof data[k] !== 'undefined') {
-							for (var l = 0; l < filterTests.length; l++) {
-								exclusiveTest[l] = new RegExp(filterTests[l], 'i').test(data[k].replace(/([^\x00-\x7F]|[.*+?^=!:${}()|\[\]\/\\]|&\s+)/g, ''));
-							}
+						// Exclusive filtering
+						if (this.settings.exclusiveFiltering === true || (this.settings.exclusiveTax !== null && Array.isArray(this.settings.exclusiveTax) && this.settings.exclusiveTax.indexOf(k) !== -1)) {
+							testResults[l] = this.filterMatching(filters[k], data[k], false);
 						}
-
-						if (exclusiveTest.indexOf(true) === -1) {
-							filterTest = false;
+						// Inclusive filtering
+						else {
+							testResults[l] = this.filterMatching(filters[k], data[k]);
 						}
 					}
-					// Inclusive filtering
-					else {
-						if (typeof data[k] === 'undefined' || !(new RegExp(filters[k].join(''), 'i').test(data[k].replace(/([^\x00-\x7F]|[.*+?^=!:${}()|\[\]\/\\]|&\s+)/g, '')))) {
-							filterTest = false;
-						}
+
+					if (testResults.indexOf(true) === -1) {
+						filterTest = false;
 					}
 				}
 			}
 
-			if (filterTest) {
-				return true;
-			}
+			return filterTest;
 		},
 
 		/**
@@ -1016,6 +1043,7 @@
 		 *
 		 * @param currentPage {number}
 		 * @param totalPages {number}
+		 *
 		 * @returns {string}
 		 */
 		_paginationOutput: function(currentPage, totalPages) {
@@ -1097,6 +1125,7 @@
 		 * @param markerUrl {string} path to marker image
 		 * @param markerWidth {number} width of marker
 		 * @param markerHeight {number} height of marker
+		 *
 		 * @returns {Object} Google Maps icon object
 		 */
 		markerImage: function (markerUrl, markerWidth, markerHeight) {
@@ -1129,9 +1158,11 @@
 		 * @param point {Object} LatLng of current location
 		 * @param name {string} location name
 		 * @param address {string} location address
-		 * @param letter {string} optional letter used for front-end identification and correlation between list and points
+		 * @param letter {string} optional letter used for front-end identification and correlation between list and
+		 *     points
 		 * @param map {Object} the Google Map
 		 * @param category {string} location category/categories
+		 *
 		 * @returns {Object} Google Maps marker
 		 */
 		createMarker: function (point, name, address, letter, map, category) {
@@ -1212,6 +1243,7 @@
 		 * @param currentMarker {Object} Google Maps marker
 		 * @param storeStart {number} optional first location on the current page
 		 * @param page {number} optional current page
+		 *
 		 * @returns {Object} extended location data object
 		 */
 		_defineLocationData: function (currentMarker, storeStart, page) {
@@ -1351,7 +1383,7 @@
 					if ($selectedLocation.length > 0) {
 						// Marker click callback
 						if (_this.settings.callbackMarkerClick) {
-							_this.settings.callbackMarkerClick.call(this, marker, markerId, $selectedLocation, locationset[markerId]);
+							_this.settings.callbackMarkerClick.call(this, marker, markerId, $selectedLocation, locationset[markerId], _this.map);
 						}
 
 						$('.' + _this.settings.locationList + ' li').removeClass('list-focus');
@@ -1514,6 +1546,7 @@
 		 * Get the address by marker ID
 		 *
 		 * @param markerID {number} location ID
+		 *
 		 * @returns {string} formatted address
 		 */
 		getAddressByMarker: function(markerID) {
@@ -1692,6 +1725,7 @@
 					// Get the user input and use it
 					addressInput = $addressInput.val() || '';
 					searchInput = $searchInput.val() || '';
+
 					// Get the distance if set
 					if (this.settings.maxDistance === true) {
 						distance = $distanceInput.val() || '';
@@ -1739,6 +1773,10 @@
 				this._start();
 			}
 			else if (addressInput !== '') {
+				// Check for existing name search and remove if address input is blank.
+				if (searchInput === '' && filters.hasOwnProperty('name')) {
+					delete filters.name;
+				}
 
 				// Geocode the origin if needed
 				if (typeof originalOrigin !== 'undefined' && typeof olat !== 'undefined' && typeof olng !== 'undefined' && (addressInput === originalOrigin)) {
@@ -1886,7 +1924,8 @@
 		},
 
 		/**
-		 * Set up front-end ordering functionality - this ties in to sorting and that has to be enabled for this to work.
+		 * Set up front-end ordering functionality - this ties in to sorting and that has to be enabled for this to
+		 * work.
 		 */
 		order: function() {
 			this.writeDebug('order',arguments);
@@ -2574,9 +2613,49 @@
 		},
 
 		/**
+		 * Restrict featured locations from displaying in results by a specific distance
+		 *
+		 * @returns {Array}
+		 */
+		featuredDistanceRestriction: function() {
+			this.writeDebug('featuredDistanceRestriction',arguments);
+			var _this = this;
+
+			featuredset = $.grep(featuredset, function (val) {
+
+				if (val.hasOwnProperty('distance')) {
+					return parseFloat(val.distance) <= parseFloat(_this.settings.featuredDistance);
+				}
+			});
+
+			return featuredset;
+		},
+
+		/**
+		 * Restrict featured locations by distance.
+		 *
+		 * @returns {Array}
+		 */
+		featuredRestrictions: function(mappingObject) {
+			this.writeDebug('featuredRestrictions',arguments);
+
+			if (this.settings.featuredDistance === null) {
+				return featuredset;
+			}
+
+			// Featured locations radius restriction.
+			if (this.settings.featuredDistance !== null) {
+					featuredset = this.featuredDistanceRestriction(mappingObject);
+			}
+
+			return featuredset;
+		},
+
+		/**
 		 * The primary mapping function that runs everything
 		 *
-		 * @param mappingObject {Object} all the potential mapping properties - latitude, longitude, origin, name, max distance, page
+		 * @param mappingObject {Object} all the potential mapping properties - latitude, longitude, origin, name, max
+		 *     distance, page
 		 */
 		mapping: function (mappingObject) {
 			this.writeDebug('mapping',arguments);
@@ -2638,7 +2717,8 @@
 		/**
 		 * Processes the location data
 		 *
-		 * @param mappingObject {Object} all the potential mapping properties - latitude, longitude, origin, name, max distance, page
+		 * @param mappingObject {Object} all the potential mapping properties - latitude, longitude, origin, name, max
+		 *     distance, page
 		 * @param originPoint {Object} LatLng of origin point
 		 * @param data {Object} location data
 		 * @param page {number} current page number
@@ -2745,7 +2825,7 @@
 
 			// Name search - using taxonomy filter to handle
 			if (_this.settings.nameSearch === true) {
-				if (typeof searchInput !== 'undefined') {
+				if (typeof searchInput !== 'undefined' && '' !== searchInput) {
 					filters[_this.settings.nameAttribute] = [searchInput];
 				}
 			}
@@ -2761,7 +2841,13 @@
 							if (!taxFilters[k]) {
 								taxFilters[k] = [];
 							}
-							taxFilters[k][z] = '(?=.*\\b' + filters[k][z].replace(/([^\x00-\x7F]|[.*+?^=!:${}()|\[\]\/\\]|&\s+)/g, '') + '\\b)';
+
+							// Swap pattern matching depending on name search vs. taxonomy filtering.
+							if ( k === _this.settings.nameAttribute ) {
+								taxFilters[k][z] = '(?:^|\\s)' + filters[k][z].replace(/([.*+?^=!:${}()|\[\]\/\\]|&\s+)/g, '');
+							} else {
+								taxFilters[k][z] = '(?=.*' + filters[k][z].replace(/([.*+?^=!:${}()|\[\]\/\\]|&\s+)/g, '') + '(?!\\s))';
+							}
 						}
 					}
 				}
@@ -2810,14 +2896,22 @@
 
 			// Featured locations filtering
 			if (_this.settings.featuredLocations === true) {
+
 				// Create array for featured locations
 				featuredset = $.grep(locationset, function (val) {
-					return val.featured === 'true';
+						if (val.hasOwnProperty('featured')) {
+								return val.featured === 'true';
+						}
 				});
+
+				// Featured location restrictions.
+				featuredset = _this.featuredRestrictions(mappingObject);
 
 				// Create array for normal locations
 				normalset = $.grep(locationset, function (val) {
-					return val.featured !== 'true';
+					if (val.hasOwnProperty('featured')) {
+						return val.featured !== 'true';
+					}
 				});
 
 				// Combine the arrays
@@ -2863,7 +2957,7 @@
 				storeNumToShow = _this.settings.locationsPerPage;
 				storeStart = page * _this.settings.locationsPerPage;
 
-				if( (storeStart + storeNumToShow) > locationset.length ) {
+				if ( (storeStart + storeNumToShow) > locationset.length ) {
 					storeNumToShow = _this.settings.locationsPerPage - ((storeStart + storeNumToShow) - locationset.length);
 				}
 
@@ -2879,7 +2973,13 @@
 			_this.resultsTotalCount(locationset.length);
 
 			// Google maps settings
-			if ((_this.settings.fullMapStart === true && firstRun === true && _this.settings.querystringParams !== true) || (_this.settings.mapSettings.zoom === 0) || (typeof origin === 'undefined') || (distError === true)) {
+			if (
+				(_this.settings.fullMapStart === true && firstRun === true && _this.settings.querystringParams !== true) ||
+				(_this.settings.mapSettings.zoom === 0) ||
+				(typeof origin === 'undefined') ||
+				(distError === true) ||
+				(_this.settings.maxDistance === true && firstRun === false)
+			) {
 				myOptions = _this.settings.mapSettings;
 				bounds = new google.maps.LatLngBounds();
 			}
@@ -2910,7 +3010,6 @@
 				google.maps.event.trigger(_this.map, 'resize');
 				_this.map.setCenter(center);
 			});
-
 
 			// Add map drag listener if setting is enabled and re-search on drag end
 			if (_this.settings.dragSearch === true ) {
@@ -2966,7 +3065,13 @@
 				marker = _this.createMarker(point, locationset[y].name, locationset[y].address, letter, _this.map, locationset[y].category);
 				marker.set('id', y);
 				markers[y] = marker;
-				if ((_this.settings.fullMapStart === true && firstRun === true && _this.settings.querystringParams !== true) || (_this.settings.mapSettings.zoom === 0) || (typeof origin === 'undefined') || (distError === true)) {
+				if (
+					(_this.settings.fullMapStart === true && firstRun === true && _this.settings.querystringParams !== true) ||
+					(_this.settings.mapSettings.zoom === 0) ||
+					(typeof origin === 'undefined') ||
+					(distError === true) ||
+					(_this.settings.maxDistance === true && firstRun === false)
+				) {
 					bounds.extend(point);
 				}
 				// Pass variables to the pop-up infowindows
@@ -2974,21 +3079,22 @@
 			}
 
 			// Center and zoom if no origin or zoom was provided, or distance of first marker is greater than distanceAlert
-			if ((_this.settings.fullMapStart === true && firstRun === true && _this.settings.querystringParams !== true) || (_this.settings.mapSettings.zoom === 0) || (typeof origin === 'undefined') || (distError === true)) {
+			if (
+				(_this.settings.fullMapStart === true && firstRun === true && _this.settings.querystringParams !== true) ||
+				(_this.settings.mapSettings.zoom === 0) ||
+				(typeof origin === 'undefined') ||
+				(distError === true) ||
+				(_this.settings.maxDistance === true && firstRun === false)
+			) {
+				_this.map.fitBounds(bounds);
 
-
-				// @tones350 added way to set zoom for single location
-				// Map set callback.
-				if (storeNum === 1) {
-					_this.map.setZoom(originalZoom);
-					// zoom issue
-					_this.map.setCenter(point);
-				} else {		
-					var fitBoundsPadding = this.settings.fitBoundsPadding;
-
-					_this.map.fitBounds(bounds,fitBoundsPadding);
-				}
-
+				// Prevent zooming in too far after fitBounds
+				var zoomListener = google.maps.event.addListener(_this.map, 'idle', function() {
+					if (_this.map.getZoom() > 16) {
+						_this.map.setZoom(16);
+					}
+					google.maps.event.removeListener(zoomListener);
+				});
 			}
 
 			// Create the links that focus on the related marker
@@ -2996,7 +3102,13 @@
 			locList.empty();
 
 			// Set up the location list markup
-			if (firstRun && _this.settings.fullMapStartListLimit !== false && !isNaN(_this.settings.fullMapStartListLimit) && _this.settings.fullMapStartListLimit !== -1) {
+			if (
+				firstRun &&
+				_this.settings.fullMapStartListLimit !== false &&
+				!isNaN(_this.settings.fullMapStartListLimit) &&
+				_this.settings.fullMapStartListLimit !== -1 &&
+				markers.length > _this.settings.fullMapStartListLimit
+			) {
 				for (var m = 0; m < _this.settings.fullMapStartListLimit; m++) {
 					var currentMarker = markers[m];
 					_this.listSetup(currentMarker, storeStart, page);

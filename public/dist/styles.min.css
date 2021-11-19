@@ -5512,6 +5512,23 @@ li.checkbox input[type="radio"]:checked + label:before {
   .bh-sl-form-container #bh-sl-submit {
     padding: 0px 23px; } }
 
+#bh-sl-static.static-feed {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background: url(../../../images/test-map-bg.png) no-repeat;
+  background-position: center;
+  transition: opacity 0.5s ease;
+  opacity: 1; }
+
+.single .map-overlay {
+  background-color: transparent; }
+
+.sidebar #bh-sl-static.static {
+  opacity: 0; }
+
 .map-top-container.error {
   background-color: #333; }
 
