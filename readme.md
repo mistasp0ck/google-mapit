@@ -3,6 +3,7 @@ Google MapIt for Wordpress
 
 This plugin extends the [jQuery Maps Locator Plugin](https://github.com/bjorn2404/jQuery-Store-Locator-Plugin) created by [Bjorn Holine](http://www.bjornblog.com/).  Adds the ability to add interactive google maps via the shortcode `[map]` and add Locations to the map.  Locations can be categorized allowing you to make many different map variations to display.
 
+
 Shortcode Options
 -----------------
 Code Example  | Options
